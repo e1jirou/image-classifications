@@ -50,14 +50,14 @@ def change_brightness(img, p=0.5, shift_range=(0.75,1.25)):
 def flow_datagen(datagen, X_train, y_train, batch_size=32, shuffle=True, functions=[]):
     for X, y in datagen.flow(X_train, y_train, batch_size=batch_size, shuffle=shuffle):
         for function in functions:
-            X = [function(img) for img in X]
+            X = np.array([function(img) for img in X])
         yield X, y
 
 
 def show_augmented_images(datagen, X_train, y_train, classes):
     print('After Augmentation')
     for X, y in flow_datagen(datagen, X_train, y_train, batch_size=20, shuffle=False, functions=[random_erasing]):
-        show_images(np.array(X), y, classes)
+        show_images(X, y, classes)
         break
 
 
