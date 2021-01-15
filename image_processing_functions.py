@@ -118,3 +118,18 @@ def show_mislead_images(X_test, y_test, pred, classes):
             plt.xlabel('ans:' + classes[np.argmax(y_test[i])] + ' pred:' + classes[np.argmax(pred[i])])
     plt.show()
 
+
+def ensemble_learning(X_test, y_test, weights_file_names, model, datagen, work_dir):
+    ensemble_pred = np.zeros_like(y_test)
+    for idx, file_name in enumerate(weights_file_names):
+        model.load_weights(work_dir + file_name)
+        model.compile()
+        pred = tta(model, datagen, X_test, epochs=10)
+        ensemble_pred += pred
+        print(file_name, 'test results')
+        print('acc:', calculate_acc(pred, y_test), '   ',
+              idx+1, 'ensemble acc:', calculate_acc(ensemble_pred/(idx+1), y_test))
+    ensemble_pred /= len(weights_file_names)
+    print('~~~final ensemble test results~~~')
+    print('acc:', calculate_acc(ensemble_pred, y_test))
+    show_mislead_images(X_test, y_test, ensemble_pred, classes)
