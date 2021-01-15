@@ -124,7 +124,7 @@ def ensemble_learning(X_test, y_test, weights_file_names, model, datagen, work_d
     for idx, file_name in enumerate(weights_file_names):
         model.load_weights(work_dir + file_name)
         model.compile()
-        pred = tta(model, datagen, X_test, epochs=10)
+        pred = test_time_augmentation(model, datagen, X_test, epochs=10)
         ensemble_pred += pred
         print(file_name, 'test results')
         print('acc:', calculate_acc(pred, y_test), '   ',
