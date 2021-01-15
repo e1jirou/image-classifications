@@ -83,7 +83,7 @@ def plot_history(history):
     plt.show()
 
 
-def test_time_augmentation(model, datagen, X_test, epochs=20, len_classes=10):
+def test_time_augmentation(model, datagen, X_test, epochs=10, len_classes=10):
     test_size = X_test.shape[0]
     pred = np.zeros(shape=(test_size,len_classes), dtype=float)
     for _ in range(epochs):
