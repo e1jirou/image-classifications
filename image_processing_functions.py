@@ -99,23 +99,41 @@ def calculate_acc(pred, ans):
     return cnt / len(pred)
 
 
-def show_mislead_images(X_test, y_test, pred, classes):
+def show_mistaken_images(X_test, y_test, y_pred, classes):
     cnt = 0
-    plt.figure(figsize=(25,5))
+    plt.figure(figsize=(10,5))
     for i in range(y_test.shape[0]):
-        if cnt == 20:
+        if cnt == 10:
             break
-        if y_test[i][np.argmax(pred[i])] == 0:
+        if y_test[i][np.argmax(y_pred[i])] == 0:
             cnt += 1
-            plt.subplot(2,10,cnt)
+            plt.subplot(2,5,cnt)
             plt.xticks([])
             plt.yticks([])
             plt.grid(False)
             try:
                 plt.imshow(X_test[i], cmap=plt.cm.binary)
             except:
-                plt.imshow(np.reshape(X_test[i], (X_test.shape[1],X_test.shape[2])), cmap=plt.cm.binary)
-            plt.xlabel('ans:' + classes[np.argmax(y_test[i])] + ' pred:' + classes[np.argmax(pred[i])])
+                plt.imshow(np.reshape(X_test[i], (X_test.shape[1],X_test.shape[2])),
+                           cmap=plt.cm.binary)
+            plt.xlabel('ans:' + classes[np.argmax(y_test[i])] +\
+                       ' pred:' + classes[np.argmax(y_pred[i])])
+    plt.show()
+
+
+def plot_confusion_matrix(y_test, y_pred, classes):
+    if len(y_test.shape) == 2:
+        y_test = np.argmax(y_test, axis=1)
+    if len(y_pred.shape) == 2:
+        y_pred = np.argmax(y_pred, axis=1)
+    cmx = confusion_matrix(y_test, y_pred)
+    vmax = np.sort(np.ravel(cmx))[-len(classes)-1]
+    cmx = pd.DataFrame(cmx, index=classes, columns=classes)
+    plt.figure(figsize=(10,10))
+    sns.heatmap(cmx, vmax=vmax, annot=True, square=True)
+    plt.xlabel('pred')
+    plt.ylabel('ans')
+    plt.title('confusion matrix')
     plt.show()
 
 
@@ -132,4 +150,4 @@ def ensemble_learning(X_test, y_test, weights_file_names, model, datagen, work_d
     ensemble_pred /= len(weights_file_names)
     print('~~~final ensemble test results~~~')
     print('acc:', calculate_acc(ensemble_pred, y_test))
-    show_mislead_images(X_test, y_test, ensemble_pred, classes)
+    show_mistaken_images(X_test, y_test, ensemble_pred, classes)
